@@ -1,14 +1,24 @@
 <?php
 
 require_once 'DAO.php';
+require_once 'ENV.php';
 
 class CRUD
 {
+    private static function GetSchemaName()
+    {
+        Env::Load('../env');
+        return Env::Get('database');
+    }
+
     public static function Insert($values)
     {
-        $query = "INSERT INTO " . static::$table . ' (' . static::$fields . ') ' . " VALUES $values";
+        $query = "INSERT INTO `" . self::GetSchemaName() . "`." . '`' . static::$table . '`' . ' (' . implode(', ', static::$fields) . ') ' . " VALUES($values)";
 
-        return DAO::Instance()->Query($query);
+        $status = DAO::Instance()->Query($query);
+        DAO::Instance()->connection->commit();
+
+        return $status;
     }
 
     public static function Select($fields='*', $conditions=NULL, $order=NULL, $limit=NULL)
@@ -29,15 +39,14 @@ class CRUD
 
     public static function Update($newValues, $conditions)
     {
-        $query = "UPDATE " . static::$table . " SET $newValues WHERE $conditions";
+        $query = "UPDATE " . '`' . self::GetSchemaName() . '`.`' . static::$table . "` SET $newValues WHERE $conditions";
 
         return DAO::Instance()->Query($query);
     }
 
     public static function Delete($conditions)
     {
-        $query = "DELETE FROM " . static::$table . " WHERE $conditions";
-
+        $query = "DELETE FROM `". self::GetSchemaName() . '`.`' . static::$table . "` WHERE $conditions";
         return DAO::Instance()->Query($query);
     }
 

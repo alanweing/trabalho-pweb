@@ -1,0 +1,139 @@
+<?php
+require_once '../Model/Product.php';
+
+$products = Product::Select();
+?>
+<br />
+
+<div id="add-product-status">
+
+</div>
+
+<br />
+<button type="button" class="btn btn-outline-primary btn-lg btn-block" data-toggle="modal" data-target="#addProductModal">Adicionar produto</button>
+<br />
+
+<div class="modal fade" id="addProductModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar Produto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-product-form">
+                    <div class="form-group">
+                        <label>Nome do produto</label>
+                        <input id="add-product-name" type="text" class="form-control" placeholder="Nome" required>
+                        <label>Valor do produto</label>
+                        <input id="add-product-value" type="number" class="form-control" placeholder="0.00" required>
+                        <br />
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button id="add-product-button" type="button" class="btn btn-success" data-dismiss="modal">Adicionar!</button>
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<div class="card-columns">-->
+<!--    <form onsubmit="">-->
+<div class="card-group">
+<?php
+while ($product = $products->fetch_assoc())
+{
+?>
+    <div class="card">
+<!--        <div class="form-group" id="--><?//=$product['id']?><!--" style="text-align:center">-->
+            <div class="card-block" id="<?=$product['id']?>">
+                <label>Nome do produto</label>
+                <input type="text" class="form-control" value="<?=$product['name']?>">
+                <label>Valor do produto</label>
+                <input type="number" class="form-control" value="<?=$product['value']?>">
+                <br />
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-success modify-product">Atualizar valores</button>
+                    <button type="button" class="btn btn-outline-danger delete-product">Excluir produto</button>
+                </div>
+            </div>
+<!--        </div>-->
+    </div>
+
+<?php
+}
+?>
+</div>
+<!--    </form>-->
+<!--</div>-->
+
+<br />
+<br />
+
+<script>
+    function showStatus(success, title, message)
+    {
+        $('#add-product-status').html('<div class="alert alert-' + (success ? 'success' : 'danger') + ' alert-dismissible fade show" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>'+title+'</strong> '+message+'</div>');
+    }
+
+    $('#add-product-button').on('click', function() {
+        $.ajax(
+            {
+                url: 'Controller/ProductController.php',
+                method: 'POST',
+                data: {'action': 'create', 'name': $('#add-product-name').val(), 'value': $('#add-product-value').val()},
+                success: function()
+                {
+                    document.getElementById('add-product-form').reset();
+                    showStatus(true, "Sucesso!", "Produto inserido!");
+                },
+                error: function()
+                {
+                    showStatus(false, "Aw, snap!", "Algo deu errado :(");
+                }
+            });
+    });
+
+    $('.modify-product').on('click', function() {
+        var closestElement = $(this).closest('.card-block');
+        var children = closestElement.find('input');
+        $.ajax(
+            {
+                url: 'Controller/ProductController.php',
+                method: 'POST',
+                data: {'action': 'update', 'name': children[0].value, 'value': children[1].value, 'id': closestElement.attr('id')},
+                success: function()
+                {
+                    showStatus(true, "Sucesso!", "Produto modificado!");
+                },
+                error: function()
+                {
+                    showStatus(false, "Aw, snap!", "Algo deu errado :(");
+                }
+            });
+    });
+
+    $('.delete-product').on('click', function() {
+        var closestElement = $(this).closest('.card-block');
+        $.ajax(
+            {
+                url: 'Controller/ProductController.php',
+                method: 'POST',
+                data: {'action': 'delete', 'id': closestElement.attr('id')},
+                success: function()
+                {
+                    showStatus(true, "Sucesso!", "Produto deletado!");
+                },
+                error: function()
+                {
+                    showStatus(false, "Aw, snap!", "Algo deu errado :(");
+                }
+            });
+    });
+
+</script>

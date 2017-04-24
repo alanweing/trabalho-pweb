@@ -1,0 +1,2 @@
+Para criar o schema e inserir valores nesse, executar o arquivo 'execute_me.sql' no banco de dados. 
+Antes de abrir a página 'index.php', efetuar as configurações de conexão com o banco no arquivo 'env'.

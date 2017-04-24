@@ -4,7 +4,7 @@ final class Env
 {
     private static $data;
 
-    public static function Load(string $file = 'env')
+    public static function Load(string $file = '../env')
     {
         return self::$data = parse_ini_file($file);
     }

@@ -16,6 +16,12 @@ final class DAO
             Debug::DD(mysqli_error());
     }
 
+    private function Connect()
+    {
+        list($host, $user, $password, $database) = ENV::GetMySQLConf();
+        $this->connection = mysqli_connect($host, $user, $password, $database);
+    }
+
     public static function Instance()
     {
         if (is_null(self::$instance))
@@ -26,6 +32,12 @@ final class DAO
 
     public function Query(string $query)
     {
+        if (!$this->connection->ping())
+        {
+            echo "deu ruim";
+            $this->Connect();
+        }
+
         return $this->connection->query($query);
     }
 
