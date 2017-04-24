@@ -1,0 +1,8 @@
+; Esse arquivo apenas funciona usando um banco de dados MariaDB ou MySQL
+; arquivo de configuração temporário, pois está exposto ao usuário
+
+debug=true
+host=127.0.0.1
+user=root
+password=
+database=trabalho_alan
